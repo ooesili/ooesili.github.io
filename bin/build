@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -e
+
+# clean up
+rm -rf dist
+mkdir dist || true
+
+# build presentation
+lein run > dist/index.html
+
+# copy static assets
+cp -r resources/* dist

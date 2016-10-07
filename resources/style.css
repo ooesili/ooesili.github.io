@@ -1,0 +1,13 @@
+body {
+  background-image: url('/images/compozed-background.png');
+  background-position: left;
+  background-size: cover;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  text-transform: none !important;
+}
+
+.light-bulb {
+  /* visibility: hidden; */
+}

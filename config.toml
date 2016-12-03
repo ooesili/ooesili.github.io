@@ -1,0 +1,41 @@
+baseurl = "https://ooesili.github.io"
+title = "Wesley Merkel"
+author = "Wesley Merkel"
+languageCode = "en-us"
+theme = "blackburn"
+
+copyright = "&copy; 2016. All rights reserved."
+canonifyurls = true
+paginate = 10
+
+[indexes]
+  tag = "tags"
+  topic = "topics"
+
+[params]
+  subtitle = "now with reduced sodium"
+  brand = "Wesley Merkel"
+
+  googleAnalytics = "UA-88352462-1"
+  disqus = "reduced-sodium"
+  highlightjs = "androidstudio"
+  dateFormat = "Jan 02, 2006"
+
+[menu]
+  [[menu.main]]
+    name = "Home"
+    pre = "<i class='fa fa-home fa-fw'></i>"
+    weight = 0
+    identifier = "home"
+    url = "/"
+  [[menu.main]]
+    name = "Posts"
+    pre = "<i class='fa fa-list fa-fw'></i>"
+    weight = 1
+    identifier = "post"
+    url = "/post/"
+
+[social]
+  github = "ooesili"
+  twitter = "ooesili"
+  # keybase = "*"

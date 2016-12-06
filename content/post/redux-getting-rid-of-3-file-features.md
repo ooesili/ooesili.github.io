@@ -4,8 +4,9 @@ tags = [
   'react',
   'redux'
 ]
-date = "2016-11-18T14:50:32-07:00"
+date = "2016-12-06T00:46:57-07:00"
 title = "Redux: Eliminating the Three-File Feature"
+draft = false
 
 +++
 

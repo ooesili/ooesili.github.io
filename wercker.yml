@@ -1,0 +1,19 @@
+box:
+  id: andthensome/alpine-hugo-git-bash
+  ports: [1313]
+
+dev:
+  steps:
+  - script:
+      name: hugo server
+      code: hugo server --buildDrafts --bind 0.0.0.0
+
+deploy:
+  steps:
+  - script:
+      name: build site
+      code: hugo
+  - lukevivier/gh-pages@0.2.1:
+      token: $GITHUB_TOKEN
+      repo: ooesili/ooesili.github.io
+      basedir: public

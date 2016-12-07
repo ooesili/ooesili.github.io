@@ -11,6 +11,9 @@ dev:
 deploy:
   steps:
   - script:
+      name: initialize submodules
+      code: git submodule update --init --recursive
+  - script:
       name: build site
       code: hugo
   - lukevivier/gh-pages@0.2.1:

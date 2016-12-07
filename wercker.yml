@@ -4,15 +4,16 @@ box:
 
 dev:
   steps:
+  - script: &submodules
+      name: initialize submodules
+      code: git submodule update --init --recursive
   - script:
       name: hugo server
       code: hugo server --buildDrafts --bind 0.0.0.0
 
 deploy:
   steps:
-  - script:
-      name: initialize submodules
-      code: git submodule update --init --recursive
+  - script: *submodules
   - script:
       name: build site
       code: hugo

@@ -87,7 +87,7 @@ export function app (state = 0, action) {
 }
 ```
 
-You can also re-export these files from a `index` file if you didn't want to
+You can also re-export these files from an `index` file if you didn't want to
 change the way the module is consumed:
 
 `index.js`
@@ -100,7 +100,7 @@ Wonderful! Now it's much easier to find what you are looking for. Where is the
 `increment` action creators defined? `actions.js`. Looking for the increment
 action handler? `reducer.js`.
 
-What if we wanted to add an action to reset the state to `0`? We'll we'd of
+What if we wanted to add an action to reset the state to `0`? Well, we'd of
 course have to add a new type to `actionTypes.js`. Then we'd need to add an
 action creator to `actions.js`. Finally we'd have to add another case for this
 action in `reducer.js`. Behold, the three-file-feature!
@@ -112,17 +112,17 @@ themselves.
 
 ## Folders-by-feature vs Folders-by-type
 
-When an app grows, the are generally two ways to organize its modules: by
+When an app grows, there are generally two ways to organize its modules: by
 putting modules of the same type together, or by putting modules of the same
 feature together. This is a topic that deserves its own nuanced discussion so
-we won't go to deep into it here, but we will briefly explore each option.
+we won't go too deep into it here, but we will briefly explore each option.
 
 ### Folders-by-type
 
 Folders-by-type is something that will feel familiar to you if you have used
-Ruby on Rails before. It's also an natural extension of the design pattern
-we've already been looking at. The basic ideas is that center your folder
-structure around the types of modules in your application.
+Ruby on Rails before. It's also a natural extension of the design pattern we've
+already been looking at. The basic ideas is to center your folder structure
+around the types of modules in your application.
 
 ```bash
 blog/
@@ -153,9 +153,8 @@ Keeping these 3 structures in sync requires an unfortunate amount of
 discipline. The declarations in each file should be sorted the same way for the
 sake of consistency. This requires concious and continual effort as code is
 added and modified, [since codebases naturally tend towards disorder over
-time][entropy]. Refactoring or splitting up a module involves hurdling all
-three of these trees, keeping more of the codebase than necessary in our head
-while we work.
+time][entropy]. Working with these modules involves hurdling all three of these
+trees, keeping more of the codebase than necessary in our heads while we work.
 
 ### Folders-by-feature
 
@@ -264,7 +263,7 @@ Adding an action now only involves touching two parts of this file. This is
 definitely an improvement from before, but we are not yet down to the single
 block of code. We want each of the `case` statements in our reducer to live
 next to their actions. It would be impossible (and a bad idea) to sprinkle top
-level declarations inside of a `switch/case` statement, but what if we could to
+level declarations inside of a `switch/case` statement, but what if we could do
 the opposite? Could we split our `switch` statement into small pieces, and then
 put those pieces next to their actions?
 

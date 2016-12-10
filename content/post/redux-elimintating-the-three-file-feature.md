@@ -296,7 +296,7 @@ reducerMap[INCREMENT] = (state) => state + 1
 
 const DECREMENT = 'DECREMENT'
 export const decrement = createAction(DECREMENT)
-reducerMap[INCREMENT] = (state) => state - 1
+reducerMap[DECREMENT] = (state) => state - 1
 
 // just one block!
 const RESET = 'RESET'

@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>React on Wesley Merkel</title>
+    <link>https://ooesili.github.io/tags/react/</link>
+    <description>Recent content in React on Wesley Merkel</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2016. All rights reserved.</copyright>
+    <lastBuildDate>Tue, 06 Dec 2016 00:46:57 -0700</lastBuildDate>
+    <atom:link href="https://ooesili.github.io/tags/react/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Redux: Eliminating the Three-File Feature</title>
+      <link>https://ooesili.github.io/post/redux-elimintating-the-three-file-feature/</link>
+      <pubDate>Tue, 06 Dec 2016 00:46:57 -0700</pubDate>
+      
+      <guid>https://ooesili.github.io/post/redux-elimintating-the-three-file-feature/</guid>
+      <description>
+
+&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;Why do I have to touch three files to get a simple feature
+working?&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&amp;mdash; Dan Abramov - &lt;a href=&#34;https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367#.wb2vtkxfr&#34;&gt;You Might Not Need Redux&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;This is a common complaint from those who are new to &lt;a href=&#34;http://redux.js.org&#34;&gt;Redux&lt;/a&gt;. Redux
+provides a slew of benefits including, but not limited to, centralized state
+management and the ability to use pure functions for state changes.  However,
+like all useful things, it adds indirection to your code. The Redux community
+sees this as a win and accepts the consequences, as do I, but I don&amp;rsquo;t believe
+that the infamous three-file feature is a necessary evil.&lt;/p&gt;
+
+&lt;h2 id=&#34;status-quo&#34;&gt;Status Quo&lt;/h2&gt;
+
+&lt;p&gt;This difficulty in adding an action comes from the design pattern that Redux&amp;rsquo;s
+official documentation uses. Let&amp;rsquo;s look at how this pattern came about, then
+we&amp;rsquo;ll look at how we can improve on it. The docs demonstrate using
+&lt;code&gt;switch/case&lt;/code&gt; statements when creating reducers.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;// action types
+const INCREMENT = &#39;INCREMENT&#39;
+const DECREMENT = &#39;DECREMENT&#39;
+
+// action creators
+export const increment = createAction(INCREMENT)
+export const decrement = createAction(DECREMENT)
+
+// reducer
+export function app (state = 0, action) {
+  switch(action.type) {
+    case INCREMENT:
+      return state + 1
+    case DECREMENT:
+      return state - 1
+    default:
+      return state
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Even to someone unfamiliar with Redux, this is arguably quite clear. This
+pattern works great for small applications and introductory documentation, but
+it does not scale well, or at least it could scale better. This file will grow
+and grow until the only way to find anything in your application is to use
+&lt;code&gt;grep/ag&lt;/code&gt; or your editor&amp;rsquo;s search feature.&lt;/p&gt;
+
+&lt;p&gt;You don&amp;rsquo;t have to be an expert programmer to know that keeping your entire
+application in a single file is a bad idea. With that in mind, the logical next
+step is to break up each section above into it&amp;rsquo;s own file.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;actionTypes.js&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;export const INCREMENT = &#39;INCREMENT&#39;
+export const DECREMENT = &#39;DECREMENT&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;actions.js&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;export const increment = createAction(INCREMENT)
+export const decrement = createAction(DECREMENT)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;reducer.js&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;export function app (state = 0, action) {
+  switch(action.type) {
+    case INCREMENT:
+      return state + 1
+    case DECREMENT:
+      return state - 1
+    default:
+      return state
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;You can also re-export these files from an &lt;code&gt;index&lt;/code&gt; file if you didn&amp;rsquo;t want to
+change the way the module is consumed:&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;index.js&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;export * from &#39;./reducer&#39;
+export * from &#39;./actions&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Wonderful! Now it&amp;rsquo;s much easier to find what you are looking for. Where is the
+&lt;code&gt;increment&lt;/code&gt; action creators defined? &lt;code&gt;actions.js&lt;/code&gt;. Looking for the increment
+action handler? &lt;code&gt;reducer.js&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;What if we wanted to add an action to reset the state to &lt;code&gt;0&lt;/code&gt;? Well, we&amp;rsquo;d of
+course have to add a new type to &lt;code&gt;actionTypes.js&lt;/code&gt;. Then we&amp;rsquo;d need to add an
+action creator to &lt;code&gt;actions.js&lt;/code&gt;. Finally we&amp;rsquo;d have to add another case for this
+action in &lt;code&gt;reducer.js&lt;/code&gt;. Behold, the three-file-feature!&lt;/p&gt;
+
+&lt;p&gt;Still, we&amp;rsquo;re not yet to the point where adding a feature is painful. Even
+though our module is split across three files, it&amp;rsquo;s still easy to find things.
+Yet again, pain comes when the program grows. At this point two choices present
+themselves.&lt;/p&gt;
+
+&lt;h2 id=&#34;folders-by-feature-vs-folders-by-type&#34;&gt;Folders-by-feature vs Folders-by-type&lt;/h2&gt;
+
+&lt;p&gt;When an app grows, there are generally two ways to organize its modules: by
+putting modules of the same type together, or by putting modules of the same
+feature together. This is a topic that deserves its own nuanced discussion so
+we won&amp;rsquo;t go too deep into it here, but we will briefly explore each option.&lt;/p&gt;
+
+&lt;h3 id=&#34;folders-by-type&#34;&gt;Folders-by-type&lt;/h3&gt;
+
+&lt;p&gt;Folders-by-type is something that will feel familiar to you if you have used
+Ruby on Rails before. It&amp;rsquo;s also a natural extension of the design pattern we&amp;rsquo;ve
+already been looking at. The basic ideas is to center your folder structure
+around the types of modules in your application.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;blog/
+  actionTypes/
+    comments.js
+    index.js
+    posts.js
+    users.js
+  actions/
+    comments.js
+    index.js
+    posts.js
+    users.js
+  reducers/
+    comments.js
+    index.js
+    posts.js
+    users.js
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now we can start to see the pain of our original design. Adding an action to
+delete comments would involve touching at least 3 different files in 3
+different folders. As the application grows further, and each of these folders
+starts growing, we end up with 3 tree-like structures running parallel to each
+other throughout our codebase.&lt;/p&gt;
+
+&lt;p&gt;Keeping these 3 structures in sync requires an unfortunate amount of
+discipline. The declarations in each file should be sorted the same way for the
+sake of consistency. This requires concious and continual effort as code is
+added and modified, &lt;a href=&#34;https://en.wikipedia.org/wiki/Software_entropy&#34;&gt;since codebases naturally tend towards disorder over
+time&lt;/a&gt;. Working with these modules involves hurdling all three of these
+trees, keeping more of the codebase than necessary in our heads while we work.&lt;/p&gt;
+
+&lt;h3 id=&#34;folders-by-feature&#34;&gt;Folders-by-feature&lt;/h3&gt;
+
+&lt;p&gt;It seems &lt;a href=&#34;http://marmelab.com/blog/2015/12/17/react-directory-structure.html&#34;&gt;generally accepted&lt;/a&gt; by the Redux community (&lt;a href=&#34;https://github.com/johnpapa/angular-styleguide/blob/master/a1/README.md#folders-by-feature-structure&#34;&gt;and
+others&lt;/a&gt;) that organizing modules by feature results in a
+more maintainable and easier to navigate codebase. Let&amp;rsquo;s take a look.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;blog/
+  comments/
+    actions.js
+    actionTypes.js
+    index.js
+    reducer.js
+  posts/
+    actions.js
+    actionTypes.js
+    index.js
+    reducer.js
+  users/
+    actions.js
+    actionTypes.js
+    index.js
+    reducer.js
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;When adding a feature, we still have to modify three different files, but at
+least they are in the same folder. We can take it one step further by following
+the &lt;a href=&#34;https://github.com/erikras/ducks-modular-redux&#34;&gt;&amp;ldquo;ducks&amp;rdquo;&lt;/a&gt; design pattern and combining each feature into a single
+file.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;blog/
+  comments/
+    index.js
+  posts/
+    index.js
+  users/
+    index.js
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This feels like a step backwards, but if we keep our modules small and focused,
+we&amp;rsquo;ll have a flexible hierarchy of self-contained modules that can be freely
+nested and moved around in a way that makes sense to our domain. This looks
+great until we take a closer look at one of these modules. Our ducks are living
+a double life!&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;// actions
+const ADD_USER = &#39;users/ADD_USER&#39;
+// ...
+
+// action creators
+export const addUser = createAction(ADD_USER)
+// ...
+
+// reducers
+export function users (state = [], action) {
+  switch (action.type) {
+    case ADD_USER:
+      // ...
+    default:
+      return state
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We&amp;rsquo;re back in by-type land! We have dissonance between our high-level module
+structure, and the structure of our code inside of each module. At first
+glance, this seems unavoidable, and again if modules are kept small and focused
+it&amp;rsquo;s not a huge problem. However, it doesn&amp;rsquo;t have to be this way. There is
+still room for improvement.&lt;/p&gt;
+
+&lt;p&gt;Before we try to push forward, we need a direction. What is the exact problem
+that we are trying to solve? What is the ideal behaviour of our system?
+Personally, I want adding an action to only involve touching one file, and
+ideally only a single block of code in that file.&lt;/p&gt;
+
+&lt;h2 id=&#34;the-promised-land&#34;&gt;The Promised Land&lt;/h2&gt;
+
+&lt;p&gt;As a first step, it would be really nice if we could group our actions and
+action creators together. Easy, right?&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;// actions
+const INCREMENT = &#39;INCREMENT&#39;
+export const increment = createAction(INCREMENT)
+
+const DECREMENT = &#39;DECREMENT&#39;
+export const decrement = createAction(DECREMENT)
+
+// reducer
+export function app (state = 0, action) {
+  switch(action.type) {
+    case INCREMENT:
+      return state + 1
+    case DECREMENT:
+      return state - 1
+    default:
+      return state
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Adding an action now only involves touching two parts of this file. This is
+definitely an improvement from before, but we are not yet down to the single
+block of code. We want each of the &lt;code&gt;case&lt;/code&gt; statements in our reducer to live
+next to their actions. It would be impossible (and a bad idea) to sprinkle top
+level declarations inside of a &lt;code&gt;switch/case&lt;/code&gt; statement, but what if we could do
+the opposite? Could we split our &lt;code&gt;switch&lt;/code&gt; statement into small pieces, and then
+put those pieces next to their actions?&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;const reducerMap = {}
+
+const INCREMENT = &#39;INCREMENT&#39;
+export const increment = createAction(INCREMENT)
+reducerMap[INCREMENT] = (state) =&amp;gt; state + 1
+
+const DECREMENT = &#39;DECREMENT&#39;
+export const decrement = createAction(DECREMENT)
+reducerMap[INCREMENT] = (state) =&amp;gt; state - 1
+
+export const app = combineActions(reducerMap, 0)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Voilà! Using the popular &lt;a href=&#34;https://github.com/acdlite/redux-actions&#34;&gt;redux-actions&lt;/a&gt; library, we can split
+up our reducer in exactly the way that we wanted. Each case statement becomes a
+property of the &lt;code&gt;reducerMap&lt;/code&gt; object, then a reducer is created and exported at
+the end of the file using &lt;code&gt;combineActions&lt;/code&gt;. Just to be sure, let&amp;rsquo;s see what
+it&amp;rsquo;s like to add the aforementioned &lt;code&gt;RESET&lt;/code&gt; action.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;const reducerMap = {}
+
+const INCREMENT = &#39;INCREMENT&#39;
+export const increment = createAction(INCREMENT)
+reducerMap[INCREMENT] = (state) =&amp;gt; state + 1
+
+const DECREMENT = &#39;DECREMENT&#39;
+export const decrement = createAction(DECREMENT)
+reducerMap[DECREMENT] = (state) =&amp;gt; state - 1
+
+// just one block!
+const RESET = &#39;RESET&#39;
+export const reset = createAction(RESET)
+reducerMap[RESET] = (state) =&amp;gt; 0
+
+export const app = combineActions(reducerMap, 0)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Each action now lives in a single block of code which makes adding, modifying,
+and removing actions very easy. It&amp;rsquo;s also very easy to move actions between
+modules when refactoring, and even easier to spot when one of the three parts
+of an action is missing.&lt;/p&gt;
+
+&lt;h2 id=&#34;further-exploration&#34;&gt;Further Exploration&lt;/h2&gt;
+
+&lt;p&gt;Although I see multiple advantages to this pattern, there are still unanswered
+questions. For example, when using the popular &lt;a href=&#34;https://github.com/gaearon/redux-thunk&#34;&gt;redux-thunk&lt;/a&gt;
+middleware for performing side-effects, it becomes unclear where these
+asynchronous actions should live. Since these actions don&amp;rsquo;t have a direct
+correlation with action handlers in reducer, it becomes hard to chose which
+block of code to put their definitions next to.&lt;/p&gt;
+
+&lt;p&gt;Similarly, I am not sure how this pattern would play with
+&lt;a href=&#34;https://github.com/yelouafi/redux-saga&#34;&gt;redux-saga&lt;/a&gt;, since I have not used it before. I would love to see
+some experimentation here.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

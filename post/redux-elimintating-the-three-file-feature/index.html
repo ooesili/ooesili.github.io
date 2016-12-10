@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="generator" content="Hugo 0.16" />
+
+  <title>Redux: Eliminating the Three-File Feature &middot; Wesley Merkel</title>
+
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css">
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-old-ie-min.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css">
+  <!--<![endif]-->
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://ooesili.github.io/css/side-menu-old-ie.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://ooesili.github.io/css/side-menu.css">
+  <!--<![endif]-->
+
+  <link rel="stylesheet" href="https://ooesili.github.io/css/blackburn.css">
+
+  
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
+
+  
+  
+
+  
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/androidstudio.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  
+
+  <link rel="shortcut icon" href="https://ooesili.github.ioimg/favicon.ico" type="image/x-icon" />
+
+  
+  
+
+</head>
+
+
+<body>
+<div id="layout">
+
+  
+<a href="#menu" id="menuLink" class="menu-link">
+  
+  <span></span>
+</a>
+<div id="menu">
+
+  
+  <a class="pure-menu-heading brand" href="https://ooesili.github.io/">Wesley Merkel</a>
+
+
+  <div class="pure-menu">
+    <ul class="pure-menu-list">
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://ooesili.github.io/"><i class='fa fa-home fa-fw'></i>Home</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="https://ooesili.github.io/post/"><i class='fa fa-list fa-fw'></i>Posts</a>
+      
+        </li>
+      
+    </ul>
+  </div>
+
+  <div class="pure-menu social">
+  <ul class="pure-menu-list">
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://twitter.com/ooesili" target="_blank"><i class="fa fa-twitter-square fa-fw"></i>Twitter</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://github.com/ooesili" target="_blank"><i class="fa fa-github-square fa-fw"></i>GitHub</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+  </ul>
+</div>
+
+
+  <div>
+  <div class="small-print">
+    <small>&copy; 2016. All rights reserved.</small>
+  </div>
+  <div class="small-print">
+    <small>Built with&nbsp;<a href="https://gohugo.io/" target="_blank">Hugo</a></small>
+    <small>Theme&nbsp;<a href="https://github.com/yoshiharuyamashita/blackburn" target="_blank">Blackburn</a></small>
+  </div>
+</div>
+
+</div>
+
+
+  <div id="main">
+
+
+<div class="header">
+  <h1>Redux: Eliminating the Three-File Feature</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>Dec 06, 2016</time>
+  </div>
+
+  
+
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="https://ooesili.github.iotags/javascript">javascript</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://ooesili.github.iotags/react">react</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="https://ooesili.github.iotags/redux">redux</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  
+
+<blockquote>
+<p>&ldquo;Why do I have to touch three files to get a simple feature
+working?</p>
+</blockquote>
+
+<p>&mdash; Dan Abramov - <a href="https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367#.wb2vtkxfr">You Might Not Need Redux</a></p>
+
+<p>This is a common complaint from those who are new to <a href="http://redux.js.org">Redux</a>. Redux
+provides a slew of benefits including, but not limited to, centralized state
+management and the ability to use pure functions for state changes.  However,
+like all useful things, it adds indirection to your code. The Redux community
+sees this as a win and accepts the consequences, as do I, but I don&rsquo;t believe
+that the infamous three-file feature is a necessary evil.</p>
+
+<h2 id="status-quo">Status Quo</h2>
+
+<p>This difficulty in adding an action comes from the design pattern that Redux&rsquo;s
+official documentation uses. Let&rsquo;s look at how this pattern came about, then
+we&rsquo;ll look at how we can improve on it. The docs demonstrate using
+<code>switch/case</code> statements when creating reducers.</p>
+
+<pre><code class="language-javascript">// action types
+const INCREMENT = 'INCREMENT'
+const DECREMENT = 'DECREMENT'
+
+// action creators
+export const increment = createAction(INCREMENT)
+export const decrement = createAction(DECREMENT)
+
+// reducer
+export function app (state = 0, action) {
+  switch(action.type) {
+    case INCREMENT:
+      return state + 1
+    case DECREMENT:
+      return state - 1
+    default:
+      return state
+  }
+}
+</code></pre>
+
+<p>Even to someone unfamiliar with Redux, this is arguably quite clear. This
+pattern works great for small applications and introductory documentation, but
+it does not scale well, or at least it could scale better. This file will grow
+and grow until the only way to find anything in your application is to use
+<code>grep/ag</code> or your editor&rsquo;s search feature.</p>
+
+<p>You don&rsquo;t have to be an expert programmer to know that keeping your entire
+application in a single file is a bad idea. With that in mind, the logical next
+step is to break up each section above into it&rsquo;s own file.</p>
+
+<p><code>actionTypes.js</code></p>
+
+<pre><code class="language-javascript">export const INCREMENT = 'INCREMENT'
+export const DECREMENT = 'DECREMENT'
+</code></pre>
+
+<p><code>actions.js</code></p>
+
+<pre><code class="language-javascript">export const increment = createAction(INCREMENT)
+export const decrement = createAction(DECREMENT)
+</code></pre>
+
+<p><code>reducer.js</code></p>
+
+<pre><code class="language-javascript">export function app (state = 0, action) {
+  switch(action.type) {
+    case INCREMENT:
+      return state + 1
+    case DECREMENT:
+      return state - 1
+    default:
+      return state
+  }
+}
+</code></pre>
+
+<p>You can also re-export these files from an <code>index</code> file if you didn&rsquo;t want to
+change the way the module is consumed:</p>
+
+<p><code>index.js</code></p>
+
+<pre><code class="language-javascript">export * from './reducer'
+export * from './actions'
+</code></pre>
+
+<p>Wonderful! Now it&rsquo;s much easier to find what you are looking for. Where is the
+<code>increment</code> action creators defined? <code>actions.js</code>. Looking for the increment
+action handler? <code>reducer.js</code>.</p>
+
+<p>What if we wanted to add an action to reset the state to <code>0</code>? Well, we&rsquo;d of
+course have to add a new type to <code>actionTypes.js</code>. Then we&rsquo;d need to add an
+action creator to <code>actions.js</code>. Finally we&rsquo;d have to add another case for this
+action in <code>reducer.js</code>. Behold, the three-file-feature!</p>
+
+<p>Still, we&rsquo;re not yet to the point where adding a feature is painful. Even
+though our module is split across three files, it&rsquo;s still easy to find things.
+Yet again, pain comes when the program grows. At this point two choices present
+themselves.</p>
+
+<h2 id="folders-by-feature-vs-folders-by-type">Folders-by-feature vs Folders-by-type</h2>
+
+<p>When an app grows, there are generally two ways to organize its modules: by
+putting modules of the same type together, or by putting modules of the same
+feature together. This is a topic that deserves its own nuanced discussion so
+we won&rsquo;t go too deep into it here, but we will briefly explore each option.</p>
+
+<h3 id="folders-by-type">Folders-by-type</h3>
+
+<p>Folders-by-type is something that will feel familiar to you if you have used
+Ruby on Rails before. It&rsquo;s also a natural extension of the design pattern we&rsquo;ve
+already been looking at. The basic ideas is to center your folder structure
+around the types of modules in your application.</p>
+
+<pre><code class="language-bash">blog/
+  actionTypes/
+    comments.js
+    index.js
+    posts.js
+    users.js
+  actions/
+    comments.js
+    index.js
+    posts.js
+    users.js
+  reducers/
+    comments.js
+    index.js
+    posts.js
+    users.js
+</code></pre>
+
+<p>Now we can start to see the pain of our original design. Adding an action to
+delete comments would involve touching at least 3 different files in 3
+different folders. As the application grows further, and each of these folders
+starts growing, we end up with 3 tree-like structures running parallel to each
+other throughout our codebase.</p>
+
+<p>Keeping these 3 structures in sync requires an unfortunate amount of
+discipline. The declarations in each file should be sorted the same way for the
+sake of consistency. This requires concious and continual effort as code is
+added and modified, <a href="https://en.wikipedia.org/wiki/Software_entropy">since codebases naturally tend towards disorder over
+time</a>. Working with these modules involves hurdling all three of these
+trees, keeping more of the codebase than necessary in our heads while we work.</p>
+
+<h3 id="folders-by-feature">Folders-by-feature</h3>
+
+<p>It seems <a href="http://marmelab.com/blog/2015/12/17/react-directory-structure.html">generally accepted</a> by the Redux community (<a href="https://github.com/johnpapa/angular-styleguide/blob/master/a1/README.md#folders-by-feature-structure">and
+others</a>) that organizing modules by feature results in a
+more maintainable and easier to navigate codebase. Let&rsquo;s take a look.</p>
+
+<pre><code class="language-bash">blog/
+  comments/
+    actions.js
+    actionTypes.js
+    index.js
+    reducer.js
+  posts/
+    actions.js
+    actionTypes.js
+    index.js
+    reducer.js
+  users/
+    actions.js
+    actionTypes.js
+    index.js
+    reducer.js
+</code></pre>
+
+<p>When adding a feature, we still have to modify three different files, but at
+least they are in the same folder. We can take it one step further by following
+the <a href="https://github.com/erikras/ducks-modular-redux">&ldquo;ducks&rdquo;</a> design pattern and combining each feature into a single
+file.</p>
+
+<pre><code class="language-bash">blog/
+  comments/
+    index.js
+  posts/
+    index.js
+  users/
+    index.js
+</code></pre>
+
+<p>This feels like a step backwards, but if we keep our modules small and focused,
+we&rsquo;ll have a flexible hierarchy of self-contained modules that can be freely
+nested and moved around in a way that makes sense to our domain. This looks
+great until we take a closer look at one of these modules. Our ducks are living
+a double life!</p>
+
+<pre><code class="language-javascript">// actions
+const ADD_USER = 'users/ADD_USER'
+// ...
+
+// action creators
+export const addUser = createAction(ADD_USER)
+// ...
+
+// reducers
+export function users (state = [], action) {
+  switch (action.type) {
+    case ADD_USER:
+      // ...
+    default:
+      return state
+  }
+}
+</code></pre>
+
+<p>We&rsquo;re back in by-type land! We have dissonance between our high-level module
+structure, and the structure of our code inside of each module. At first
+glance, this seems unavoidable, and again if modules are kept small and focused
+it&rsquo;s not a huge problem. However, it doesn&rsquo;t have to be this way. There is
+still room for improvement.</p>
+
+<p>Before we try to push forward, we need a direction. What is the exact problem
+that we are trying to solve? What is the ideal behaviour of our system?
+Personally, I want adding an action to only involve touching one file, and
+ideally only a single block of code in that file.</p>
+
+<h2 id="the-promised-land">The Promised Land</h2>
+
+<p>As a first step, it would be really nice if we could group our actions and
+action creators together. Easy, right?</p>
+
+<pre><code class="language-javascript">// actions
+const INCREMENT = 'INCREMENT'
+export const increment = createAction(INCREMENT)
+
+const DECREMENT = 'DECREMENT'
+export const decrement = createAction(DECREMENT)
+
+// reducer
+export function app (state = 0, action) {
+  switch(action.type) {
+    case INCREMENT:
+      return state + 1
+    case DECREMENT:
+      return state - 1
+    default:
+      return state
+  }
+}
+</code></pre>
+
+<p>Adding an action now only involves touching two parts of this file. This is
+definitely an improvement from before, but we are not yet down to the single
+block of code. We want each of the <code>case</code> statements in our reducer to live
+next to their actions. It would be impossible (and a bad idea) to sprinkle top
+level declarations inside of a <code>switch/case</code> statement, but what if we could do
+the opposite? Could we split our <code>switch</code> statement into small pieces, and then
+put those pieces next to their actions?</p>
+
+<pre><code class="language-javascript">const reducerMap = {}
+
+const INCREMENT = 'INCREMENT'
+export const increment = createAction(INCREMENT)
+reducerMap[INCREMENT] = (state) =&gt; state + 1
+
+const DECREMENT = 'DECREMENT'
+export const decrement = createAction(DECREMENT)
+reducerMap[INCREMENT] = (state) =&gt; state - 1
+
+export const app = combineActions(reducerMap, 0)
+</code></pre>
+
+<p>Voilà! Using the popular <a href="https://github.com/acdlite/redux-actions">redux-actions</a> library, we can split
+up our reducer in exactly the way that we wanted. Each case statement becomes a
+property of the <code>reducerMap</code> object, then a reducer is created and exported at
+the end of the file using <code>combineActions</code>. Just to be sure, let&rsquo;s see what
+it&rsquo;s like to add the aforementioned <code>RESET</code> action.</p>
+
+<pre><code class="language-javascript">const reducerMap = {}
+
+const INCREMENT = 'INCREMENT'
+export const increment = createAction(INCREMENT)
+reducerMap[INCREMENT] = (state) =&gt; state + 1
+
+const DECREMENT = 'DECREMENT'
+export const decrement = createAction(DECREMENT)
+reducerMap[DECREMENT] = (state) =&gt; state - 1
+
+// just one block!
+const RESET = 'RESET'
+export const reset = createAction(RESET)
+reducerMap[RESET] = (state) =&gt; 0
+
+export const app = combineActions(reducerMap, 0)
+</code></pre>
+
+<p>Each action now lives in a single block of code which makes adding, modifying,
+and removing actions very easy. It&rsquo;s also very easy to move actions between
+modules when refactoring, and even easier to spot when one of the three parts
+of an action is missing.</p>
+
+<h2 id="further-exploration">Further Exploration</h2>
+
+<p>Although I see multiple advantages to this pattern, there are still unanswered
+questions. For example, when using the popular <a href="https://github.com/gaearon/redux-thunk">redux-thunk</a>
+middleware for performing side-effects, it becomes unclear where these
+asynchronous actions should live. Since these actions don&rsquo;t have a direct
+correlation with action handlers in reducer, it becomes hard to chose which
+block of code to put their definitions next to.</p>
+
+<p>Similarly, I am not sure how this pattern would play with
+<a href="https://github.com/yelouafi/redux-saga">redux-saga</a>, since I have not used it before. I would love to see
+some experimentation here.</p>
+
+
+  
+
+
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost")
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'reduced-sodium';
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+</div>
+
+</div>
+</div>
+<script src="https://ooesili.github.iojs/ui.js"></script>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-88352462-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+</html>
+
